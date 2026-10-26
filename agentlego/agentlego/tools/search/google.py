@@ -68,7 +68,7 @@ class GoogleSearch(BaseTool):
     def apply(self,
               query: str,
               k: Annotated[int, Info('Select the first k results')] = 10) -> str:
-        status_code, results = self._search(query, search_type=self.search_type, k=k)
+        status_code, results = self._search(query, search_type=self.search_type, num=k)
 
         # convert search results to ToolReturn format
         if status_code == 200:
@@ -166,7 +166,8 @@ class GoogleSearch(BaseTool):
         params['q'] = query
 
         response = requests.post(
-            f'https://google.serper.dev/{search_type}',
+            (os.getenv('SERPER_BASE_URL') or 'https://google.serper.dev').rstrip('/') +
+            f'/{search_type}',
             headers=headers,
             params=params,
             timeout=self.timeout)
